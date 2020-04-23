@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -10,6 +11,9 @@ import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Context;
 import org.zeromq.ZMQ.Socket;
 
+import utils.Config;
+import utils.Constants;
+
 public class Main {
 
 	private static class ticker_subscriber_task implements Runnable {
@@ -17,13 +21,17 @@ public class Main {
 		protected InfluxDB influxDB;
 		
 		@SuppressWarnings("deprecation")
-		public ticker_subscriber_task(String ticker_pub)
+		public ticker_subscriber_task(String ticker_pub) throws IOException
         {
         	this.ticker_pub = ticker_pub;
         	
     		//String rpName = "aRetentionPolicy";
     		String rpName = "autogen";
-    		InfluxDB influxDB = InfluxDBFactory.connect("http://127.0.0.1:8086", "root", "root");
+    		String influxdb_address = Config.getInstance().get(Constants.influxdb_address);
+    		String influxdb_port = Config.getInstance().get(Constants.influxdb_port);
+    		String influxdb_username = Config.getInstance().get(Constants.influxdb_username);
+    		String influxdb_password = Config.getInstance().get(Constants.influxdb_password);
+    		InfluxDB influxDB = InfluxDBFactory.connect("http://"+influxdb_address+":"+influxdb_port, influxdb_username, influxdb_password);
     		influxDB.createDatabase(ticker_pub);
     		influxDB.setDatabase(ticker_pub);
     		influxDB.setRetentionPolicy(rpName);
@@ -42,8 +50,10 @@ public class Main {
 	            // Prepare our context and subscriber
 	            Context context = ZMQ.context(1);
 	            Socket subscriber = context.socket(ZMQ.SUB);
-	
-	            subscriber.connect("tcp://localhost:5563");
+	    		String zeromq_address = Config.getInstance().get(Constants.zeromq_address);
+	    		String zeromq_port = Config.getInstance().get(Constants.zeromq_port);
+	    		
+	            subscriber.connect("tcp://"+zeromq_address+":"+zeromq_port);
 	            subscriber.subscribe(this.ticker_pub.getBytes());
 	            System.out.println("Listening : "+ticker_pub);
 	            while (!Thread.currentThread ().isInterrupted ()) {
@@ -93,7 +103,7 @@ public class Main {
     }
 	
 	
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) throws InterruptedException, IOException {
 		ArrayList<Thread> thds = new ArrayList<Thread>();
 
 		for (String ticker_str : BusDefinition.getTickersBusDefinitions())
