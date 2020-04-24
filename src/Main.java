@@ -52,7 +52,7 @@ public class Main {
 	            Socket subscriber = context.socket(ZMQ.SUB);
 	    		String zeromq_address = Config.getInstance().get(Constants.zeromq_address);
 	    		String zeromq_port = Config.getInstance().get(Constants.zeromq_port);
-	    		
+
 	            subscriber.connect("tcp://"+zeromq_address+":"+zeromq_port);
 	            subscriber.subscribe(this.ticker_pub.getBytes());
 	            System.out.println("Listening : "+ticker_pub);
