@@ -32,6 +32,10 @@
 			</plugin>
 		</plugins>
 	</build>
+		<properties>
+		<log4jVersion>2.13.1</log4jVersion>
+		<disruptor.version>3.4.2</disruptor.version>
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.zeromq</groupId>
@@ -46,12 +50,24 @@
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
-			<version>2.11.1</version>
+			<version>${log4jVersion}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
-			<version>2.11.1</version>
+			<version>${log4jVersion}</version>
+		</dependency>
+		<!-- SLF4J Bridge -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<version>2.11.2</version>
+		</dependency>
+		<!-- https://logging.apache.org/log4j/2.x/manual/async.html -->
+		<dependency>
+			<groupId>com.lmax</groupId>
+			<artifactId>disruptor</artifactId>
+			<version>${disruptor.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.influxdb</groupId>
